@@ -1,0 +1,51 @@
+﻿{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password"
+  },
+  "patients": {
+    "title": "Patients",
+    "name": "Name",
+    "phone": "Phone",
+    "notes": "Notes",
+    "addPatient": "Add Patient",
+    "editPatient": "Edit Patient"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "reason": "Reason",
+    "status": "Status",
+    "scheduled": "Scheduled",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "canceled": "Canceled"
+  },
+  "queue": {
+    "title": "Waiting Room",
+    "current": "Current Patient",
+    "waiting": "Waiting",
+    "next": "Next Patient",
+    "start": "Start Consultation",
+    "available": "Available",
+    "busy": "Busy"
+  },
+  "dashboard": {
+    "admin": "Admin Dashboard",
+    "agent": "Agent Dashboard"
+  }
+}
