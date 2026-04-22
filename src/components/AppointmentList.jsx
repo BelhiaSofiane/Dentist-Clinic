@@ -3,6 +3,8 @@ import { format } from 'date-fns';
 import { Edit, Trash2 } from 'lucide-react';
 import useAppointmentStore from '../context/appointmentStore';
 import useAuthStore from '../context/authStore';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const statusTranslationKey = {
   scheduled: 'scheduled',
@@ -29,18 +31,18 @@ const AppointmentList = ({ appointments, onEdit }) => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusVariant = (status) => {
     switch (status) {
       case 'scheduled':
-        return 'bg-blue-100 text-blue-800';
+        return 'secondary';
       case 'in-progress':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'outline';
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'default';
       case 'canceled':
-        return 'bg-red-100 text-red-800';
+        return 'destructive';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'secondary';
     }
   };
 
@@ -89,25 +91,31 @@ const AppointmentList = ({ appointments, onEdit }) => {
                   {appointment.reason}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(appointment.status)}`}>
+                  <Badge variant={getStatusVariant(appointment.status)}>
                     {t(`appointments.${statusTranslationKey[appointment.status] ?? appointment.status}`)}
-                  </span>
+                  </Badge>
                 </td>
                 {canEdit && (
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => onEdit(appointment)}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      className="mr-2 text-blue-600 hover:text-blue-900"
                     >
                       <Edit className="w-4 h-4" />
-                    </button>
+                    </Button>
                     {canDelete && (
-                      <button
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
                         onClick={() => handleDelete(appointment.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     )}
                   </td>
                 )}

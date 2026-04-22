@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck, Stethoscope } from 'lucide-react';
 import useAuthStore from '../context/authStore';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -49,56 +53,57 @@ const Login = () => {
             <span className="text-sm font-semibold uppercase tracking-wide">Secure Sign In</span>
           </div>
 
-          <h2 className="text-2xl font-extrabold text-slate-900 mb-1">{t('auth.login')}</h2>
-          <p className="text-sm text-slate-500 mb-6">Use your clinic account to continue.</p>
+          <Card className="bg-white/90 backdrop-blur-sm ring-cyan-100">
+            <CardHeader>
+              <CardTitle className="text-2xl font-extrabold text-slate-900">{t('auth.login')}</CardTitle>
+              <CardDescription>Use your clinic account to continue.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-5" onSubmit={handleSubmit}>
+                <div className="space-y-2">
+                  <Label htmlFor="email">{t('auth.email')}</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder={t('auth.email')}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-10"
+                  />
+                </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
-                {t('auth.email')}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="block w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder={t('auth.email')}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">{t('auth.password')}</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    placeholder={t('auth.password')}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-10"
+                  />
+                </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
-                {t('auth.password')}
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="block w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder={t('auth.password')}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+                {error && (
+                  <div className="text-red-700 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    {error}
+                  </div>
+                )}
 
-            {error && (
-              <div className="text-red-700 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 px-4 text-sm font-semibold rounded-lg text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50"
-            >
-              {loading ? t('common.loading') : t('auth.login')}
-            </button>
-          </form>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-10 bg-cyan-600 text-white hover:bg-cyan-700"
+                >
+                  {loading ? t('common.loading') : t('auth.login')}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </section>
       </div>
     </div>
