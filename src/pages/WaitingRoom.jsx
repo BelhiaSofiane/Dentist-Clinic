@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 import { Clock, User, Users } from 'lucide-react';
+import { format } from 'date-fns';
 import useQueueStore from '../context/queueStore';
 import useAuthStore from '../context/authStore';
+import { Badge } from '@/components/ui/badge';
 
 const WaitingRoom = () => {
   const { t } = useTranslation();
@@ -33,7 +35,12 @@ const WaitingRoom = () => {
     };
   }, [fetchQueue]);
 
-  const estimatedWaitTime = queue.length * 30;
+  const nextPatientInQueue = queue[0] ?? null;
+  const upcomingPatients = queue.slice(1);
+  const estimatedWaitTime = queue.reduce(
+    (total, patient) => total + (patient.avgDurationMinutes ?? 30),
+    0
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
@@ -43,22 +50,20 @@ const WaitingRoom = () => {
           <p className="text-lg text-gray-600">Dental Clinic</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="flex items-center mb-6">
               <User className="w-8 h-8 text-green-600 mr-3" />
               <h2 className="text-2xl font-bold text-gray-900">{t('queue.current')}</h2>
             </div>
             {currentPatient ? (
-              <div className="text-center">
-                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-12 h-12 text-green-600" />
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="space-y-3">
+                <Badge className="bg-green-100 text-green-800">Current Patient</Badge>
+                <h3 className="text-3xl font-bold text-gray-900">
                   {currentPatient.patients?.name}
                 </h3>
-                <p className="text-lg text-gray-600">
-                  {currentPatient.patients?.phone}
+                <p className="text-sm text-gray-600">
+                  Avg treatment: {currentPatient.avgDurationMinutes ?? 30} min
                 </p>
               </div>
             ) : (
@@ -73,7 +78,7 @@ const WaitingRoom = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <Users className="w-8 h-8 text-blue-600 mr-3" />
-                <h2 className="text-2xl font-bold text-gray-900">{t('queue.waiting')}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Next Patient</h2>
               </div>
               <div className="flex items-center text-blue-600">
                 <Clock className="w-5 h-5 mr-2" />
@@ -83,32 +88,51 @@ const WaitingRoom = () => {
               </div>
             </div>
             <div className="space-y-4">
-              {queue.length > 0 ? (
-                queue.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                        <span className="text-blue-600 font-bold">{index + 1}</span>
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {item.patients?.name}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {item.patients?.phone}
-                        </p>
-                      </div>
+              {nextPatientInQueue ? (
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {nextPatientInQueue.patients?.name}
+                    </h3>
+                    <Badge variant="outline">Next Patient</Badge>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600 space-y-1">
+                    <p>Estimated wait: {nextPatientInQueue.estimatedWaitMinutes ?? 0} min</p>
+                    <p>ETA: {nextPatientInQueue.expectedStartAt ? format(new Date(nextPatientInQueue.expectedStartAt), 'p') : '--:--'}</p>
+                    <p>Avg treatment: {nextPatientInQueue.avgDurationMinutes ?? 30} min</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-xl text-gray-500">No next patient yet</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-8 lg:col-span-1">
+            <div className="flex items-center mb-6">
+              <Users className="w-8 h-8 text-indigo-600 mr-3" />
+              <h2 className="text-2xl font-bold text-gray-900">Upcoming Patients</h2>
+            </div>
+            <div className="space-y-3">
+              {upcomingPatients.length > 0 ? (
+                upcomingPatients.map((item) => (
+                  <div key={item.id} className="rounded-lg border border-gray-200 p-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-gray-900">{item.patients?.name}</h3>
+                      <Badge variant="secondary">Waiting</Badge>
+                    </div>
+                    <div className="mt-1 text-xs text-gray-600 space-y-1">
+                      <p>ETA: {item.expectedStartAt ? format(new Date(item.expectedStartAt), 'p') : '--:--'}</p>
+                      <p>Avg treatment: {item.avgDurationMinutes ?? 30} min</p>
+                      <p>Estimated wait: {item.estimatedWaitMinutes ?? 0} min</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-xl text-gray-500">No patients waiting</p>
-                </div>
+                <p className="text-sm text-gray-500">No additional patients waiting.</p>
               )}
             </div>
           </div>

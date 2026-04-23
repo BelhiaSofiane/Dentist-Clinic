@@ -26,7 +26,7 @@ const fetchTodayAppointmentsByPatients = async (patientIds) => {
 
   const { data, error } = await supabase
     .from('appointments')
-    .select('id, patient_id, date_time, status')
+    .select('id, patient_id, date_time, duration, status')
     .in('patient_id', patientIds)
     .gte('date_time', startIso)
     .lt('date_time', endIso)
@@ -35,15 +35,18 @@ const fetchTodayAppointmentsByPatients = async (patientIds) => {
 
   if (error) throw error;
 
-  const times = new Map();
+  const appointmentMap = new Map();
 
   (data ?? []).forEach((appointment) => {
-    if (!times.has(appointment.patient_id)) {
-      times.set(appointment.patient_id, appointment.date_time);
+    if (!appointmentMap.has(appointment.patient_id)) {
+      appointmentMap.set(appointment.patient_id, {
+        dateTime: appointment.date_time,
+        duration: appointment.duration ?? 30,
+      });
     }
   });
 
-  return times;
+  return appointmentMap;
 };
 
 const useQueueStore = create((set, get) => ({
@@ -67,26 +70,48 @@ const useQueueStore = create((set, get) => ({
 
     const rows = data ?? [];
     const patientIds = [...new Set(rows.map((row) => row.patient_id).filter(Boolean))];
-    const appointmentTimes = await fetchTodayAppointmentsByPatients(patientIds);
-    const todayPatientIds = new Set(appointmentTimes.keys());
+    const appointmentMap = await fetchTodayAppointmentsByPatients(patientIds);
+    const todayPatientIds = new Set(appointmentMap.keys());
 
     const todayRows = rows.filter((row) => todayPatientIds.has(row.patient_id));
     const waitingRows = todayRows.filter((row) => row.status === 'waiting');
     const currentRows = todayRows.filter((row) => row.status === 'current');
 
     const waitingSorted = [...waitingRows].sort((a, b) => {
-      const aTime = appointmentTimes.get(a.patient_id) ?? a.created_at;
-      const bTime = appointmentTimes.get(b.patient_id) ?? b.created_at;
+      const aTime = appointmentMap.get(a.patient_id)?.dateTime ?? a.created_at;
+      const bTime = appointmentMap.get(b.patient_id)?.dateTime ?? b.created_at;
       return new Date(aTime).getTime() - new Date(bTime).getTime();
     });
 
-    const currentPatient = currentRows.length > 0
+    const currentPatientBase = currentRows.length > 0
       ? [...currentRows].sort(
         (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       )[0]
       : null;
 
-    set({ queue: waitingSorted, currentPatient, loading: false });
+    let cumulativeWait = currentPatientBase ? (appointmentMap.get(currentPatientBase.patient_id)?.duration ?? 30) : 0;
+    const waitingWithMeta = waitingSorted.map((item) => {
+      const appointmentInfo = appointmentMap.get(item.patient_id);
+      const avgDurationMinutes = appointmentInfo?.duration ?? 30;
+      const expectedStartAt = new Date(Date.now() + cumulativeWait * 60_000).toISOString();
+      const queueItem = {
+        ...item,
+        avgDurationMinutes,
+        estimatedWaitMinutes: cumulativeWait,
+        expectedStartAt,
+      };
+      cumulativeWait += avgDurationMinutes;
+      return queueItem;
+    });
+
+    const currentPatient = currentPatientBase
+      ? {
+        ...currentPatientBase,
+        avgDurationMinutes: appointmentMap.get(currentPatientBase.patient_id)?.duration ?? 30,
+      }
+      : null;
+
+    set({ queue: waitingWithMeta, currentPatient, loading: false });
   },
 
   addToQueue: async (patientId) => {

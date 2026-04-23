@@ -7,11 +7,12 @@ import useQueueStore from '../context/queueStore';
 import PatientForm from '../components/PatientForm';
 import AppointmentForm from '../components/AppointmentForm';
 import AppointmentList from '../components/AppointmentList';
+import ConfirmActionDialog from '../components/ConfirmActionDialog';
 
 const AgentDashboard = () => {
   const { t } = useTranslation();
   const { appointments, fetchAppointments } = useAppointmentStore();
-  const { patients, fetchPatients } = usePatientStore();
+  const { patients, fetchPatients, deletePatient } = usePatientStore();
   const {
     queue,
     fetchQueue,
@@ -24,6 +25,7 @@ const AgentDashboard = () => {
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
   const [editingAppointment, setEditingAppointment] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -103,13 +105,23 @@ const AgentDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.patients?.phone}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => removeFromQueue(item.id)}
+                        onClick={() => setConfirmAction({
+                          title: 'Remove from waiting queue',
+                          description: `Remove ${item.patients?.name ?? 'this patient'} from today's waiting queue?`,
+                          confirmText: 'Remove',
+                          action: () => removeFromQueue(item.id),
+                        })}
                         className="text-red-600 hover:text-red-900 mr-4"
                       >
                         Remove
                       </button>
                       <button
-                        onClick={() => markNoShow(item.id)}
+                        onClick={() => setConfirmAction({
+                          title: 'Mark as no show',
+                          description: `Mark ${item.patients?.name ?? 'this patient'} as no-show and cancel today's appointment?`,
+                          confirmText: 'Mark no-show',
+                          action: () => markNoShow(item.id),
+                        })}
                         className="text-amber-600 hover:text-amber-900"
                       >
                         No Show
@@ -161,9 +173,20 @@ const AgentDashboard = () => {
                         setEditingPatient(patient);
                         setShowPatientForm(true);
                       }}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       {t('common.edit')}
+                    </button>
+                    <button
+                      onClick={() => setConfirmAction({
+                        title: 'Delete patient',
+                        description: `Delete ${patient.name}? This may remove related appointments if your database enforces cascade deletes.`,
+                        confirmText: 'Delete patient',
+                        action: () => deletePatient(patient.id),
+                      })}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      {t('common.delete')}
                     </button>
                   </td>
                 </tr>
@@ -200,6 +223,22 @@ const AgentDashboard = () => {
           }}
         />
       )}
+      <ConfirmActionDialog
+        open={Boolean(confirmAction)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setConfirmAction(null);
+        }}
+        title={confirmAction?.title}
+        description={confirmAction?.description}
+        confirmText={confirmAction?.confirmText ?? 'Confirm'}
+        onConfirm={async () => {
+          if (!confirmAction?.action) return;
+          await confirmAction.action();
+          setConfirmAction(null);
+        }}
+        successMessage="Action completed successfully."
+        errorMessage="Action failed. Please try again."
+      />
     </div>
   );
 };

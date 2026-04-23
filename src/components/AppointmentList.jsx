@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Edit, Trash2 } from 'lucide-react';
@@ -5,6 +6,7 @@ import useAppointmentStore from '../context/appointmentStore';
 import useAuthStore from '../context/authStore';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import ConfirmActionDialog from './ConfirmActionDialog';
 
 const statusTranslationKey = {
   scheduled: 'scheduled',
@@ -17,18 +19,15 @@ const AppointmentList = ({ appointments, onEdit }) => {
   const { t } = useTranslation();
   const { deleteAppointment } = useAppointmentStore();
   const { role } = useAuthStore();
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null);
 
   const canEdit = role === 'admin' || role === 'agent';
   const canDelete = role === 'admin';
 
-  const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this appointment?')) {
-      try {
-        await deleteAppointment(id);
-      } catch (error) {
-        console.error('Error deleting appointment:', error);
-      }
-    }
+  const handleDelete = async () => {
+    if (!appointmentToDelete) return;
+    await deleteAppointment(appointmentToDelete.id);
+    setAppointmentToDelete(null);
   };
 
   const getStatusVariant = (status) => {
@@ -111,7 +110,7 @@ const AppointmentList = ({ appointments, onEdit }) => {
                         type="button"
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => handleDelete(appointment.id)}
+                        onClick={() => setAppointmentToDelete(appointment)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -124,6 +123,18 @@ const AppointmentList = ({ appointments, onEdit }) => {
           </tbody>
         </table>
       </div>
+      <ConfirmActionDialog
+        open={Boolean(appointmentToDelete)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setAppointmentToDelete(null);
+        }}
+        title="Delete appointment"
+        description={`Delete appointment for ${appointmentToDelete?.patients?.name ?? 'this patient'}? This action cannot be undone.`}
+        confirmText="Delete"
+        onConfirm={handleDelete}
+        successMessage="Appointment deleted successfully."
+        errorMessage="Failed to delete appointment."
+      />
     </div>
   );
 };

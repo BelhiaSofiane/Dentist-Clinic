@@ -8,6 +8,7 @@ import AgentDashboard from './pages/AgentDashboard';
 import WaitingRoom from './pages/WaitingRoom';
 import Sidebar from './components/Sidebar';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import { Toaster } from '@/components/ui/sonner';
 
 function ProtectedRoute({ allowedRoles, role, children }) {
   if (!role) {
@@ -97,6 +98,7 @@ function App() {
           </main>
         </div>
       </div>
+      <Toaster position="top-right" richColors closeButton />
     </Router>
   );
 }

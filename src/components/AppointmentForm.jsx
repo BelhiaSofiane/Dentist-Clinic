@@ -1,17 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Clock3, Lock, Stethoscope, X } from 'lucide-react';
+import { CalendarDays, Clock3, Stethoscope, X } from 'lucide-react';
 import { format } from 'date-fns';
 import useAppointmentStore from '../context/appointmentStore';
 import usePatientStore from '../context/patientStore';
 import useAuthStore from '../context/authStore';
-
-const TIME_SLOTS = Array.from({ length: 18 }, (_, index) => {
-  const totalMinutes = 8 * 60 + index * 30;
-  const hour = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
-  const minute = String(totalMinutes % 60).padStart(2, '0');
-  return `${hour}:${minute}`;
-});
 
 const REASONS = [
   'consultation',
@@ -73,6 +66,8 @@ const AppointmentForm = ({ appointment, onClose }) => {
 
     return slots;
   }, [appointments, selectedDate, appointment?.id]);
+  const sortedBookedSlots = useMemo(() => [...bookedSlots].sort(), [bookedSlots]);
+  const selectedTimeLocked = Boolean(selectedTime && bookedSlots.has(selectedTime));
 
   const quickDates = useMemo(() => {
     return Array.from({ length: 6 }, (_, index) => {
@@ -95,7 +90,7 @@ const AppointmentForm = ({ appointment, onClose }) => {
         throw new Error('Please select both date and time.');
       }
 
-      if (bookedSlots.has(selectedTime)) {
+      if (selectedTimeLocked) {
         throw new Error('That time slot is already booked. Please pick another slot.');
       }
 
@@ -266,37 +261,45 @@ const AppointmentForm = ({ appointment, onClose }) => {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2 text-slate-700 font-semibold">
                   <Clock3 className="w-4 h-4" />
-                  Choose Time Slot
+                  Choose Flexible Time
                 </div>
                 <div className="text-xs text-slate-500">
                   Locked: {bookedSlots.size}
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-1">
-                {TIME_SLOTS.map((slot) => {
-                  const isLocked = bookedSlots.has(slot);
-                  const isSelected = selectedTime === slot;
-
-                  return (
-                    <button
-                      key={slot}
-                      type="button"
-                      disabled={isLocked}
-                      onClick={() => setSelectedTime(slot)}
-                      className={`px-3 py-2 text-sm rounded-lg border transition flex items-center justify-center gap-1 ${
-                        isLocked
-                          ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                          : isSelected
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white text-slate-700 border-slate-300 hover:border-blue-300 hover:bg-blue-50'
-                      }`}
-                    >
-                      {isLocked ? <Lock className="w-3 h-3" /> : null}
-                      {slot}
-                    </button>
-                  );
-                })}
+              <div className="space-y-3">
+                <input
+                  type="time"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  step="60"
+                  className={`w-full px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 ${
+                    selectedTimeLocked
+                      ? 'border-red-300 focus:ring-red-400'
+                      : 'border-slate-200 focus:ring-cyan-500'
+                  }`}
+                />
+                <p className="text-xs text-slate-500">
+                  You can choose any minute. A time is locked once already scheduled.
+                </p>
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-slate-100 p-2">
+                  <p className="text-xs font-semibold text-slate-600 mb-2">Locked times for this date</p>
+                  {sortedBookedSlots.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {sortedBookedSlots.map((slot) => (
+                        <span
+                          key={slot}
+                          className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-600 border border-slate-200"
+                        >
+                          {slot}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500">No locked times for this date.</p>
+                  )}
+                </div>
               </div>
             </div>
 
