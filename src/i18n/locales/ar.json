@@ -1,51 +1,72 @@
 ﻿{
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success"
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "back": "رجوع"
   },
   "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "email": "Email",
-    "password": "Password"
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور"
+  },
+  "settings": {
+    "title": "إعدادات الحساب",
+    "subtitle": "إدارة إعدادات الحساب والأمان",
+    "accountInfo": "معلومات الحساب",
+    "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "enterCurrentPassword": "أدخل كلمة المرور الحالية",
+    "enterNewPassword": "أدخل كلمة المرور الجديدة",
+    "changePasswordButton": "تغيير كلمة المرور",
+    "currentPasswordRequired": "كلمة المرور الحالية مطلوبة",
+    "newPasswordRequired": "كلمة المرور الجديدة مطلوبة",
+    "passwordMinLength": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+    "passwordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة",
+    "passwordsDifferent": "يجب أن تكون كلمة المرور الجديدة مختلفة عن الحالية",
+    "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح",
+    "passwordChangeFailed": "فشل في تغيير كلمة المرور",
+    "changing": "جاري التغيير..."
   },
   "patients": {
-    "title": "Patients",
-    "name": "Name",
-    "phone": "Phone",
-    "notes": "Notes",
-    "addPatient": "Add Patient",
-    "editPatient": "Edit Patient"
+    "title": "المرضى",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "notes": "ملاحظات",
+    "addPatient": "إضافة مريض",
+    "editPatient": "تعديل المريض"
   },
   "appointments": {
-    "title": "Appointments",
-    "date": "Date",
-    "time": "Time",
-    "duration": "Duration",
-    "reason": "Reason",
-    "status": "Status",
-    "scheduled": "Scheduled",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "canceled": "Canceled"
+    "title": "المواعيد",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "duration": "المدة",
+    "reason": "السبب",
+    "status": "الحالة",
+    "scheduled": "مجدول",
+    "inProgress": "قيد التنفيذ",
+    "completed": "مكتمل",
+    "canceled": "ملغى"
   },
   "queue": {
-    "title": "Waiting Room",
-    "current": "Current Patient",
-    "waiting": "Waiting",
-    "next": "Next Patient",
-    "start": "Start Consultation",
-    "available": "Available",
-    "busy": "Busy"
+    "title": "غرفة الانتظار",
+    "current": "المريض الحالي",
+    "waiting": "في الانتظار",
+    "next": "المريض التالي",
+    "start": "بدء الاستشارة",
+    "available": "متاح",
+    "busy": "مشغول"
   },
   "dashboard": {
-    "admin": "Admin Dashboard",
-    "agent": "Agent Dashboard"
+    "admin": "لوحة تحكم المسؤول",
+    "agent": "لوحة تحكم الوكيل"
   }
 }

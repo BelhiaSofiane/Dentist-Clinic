@@ -7,13 +7,34 @@
     "add": "Add",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "back": "Back"
   },
   "auth": {
     "login": "Login",
     "logout": "Logout",
     "email": "Email",
     "password": "Password"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "subtitle": "Manage your account and security settings",
+    "accountInfo": "Account Information",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "enterCurrentPassword": "Enter current password",
+    "enterNewPassword": "Enter new password",
+    "changePasswordButton": "Change Password",
+    "currentPasswordRequired": "Current password is required",
+    "newPasswordRequired": "New password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordsDoNotMatch": "New passwords do not match",
+    "passwordsDifferent": "New password must be different from current password",
+    "passwordChangedSuccess": "Password changed successfully",
+    "passwordChangeFailed": "Failed to change password",
+    "changing": "Changing..."
   },
   "patients": {
     "title": "Patients",

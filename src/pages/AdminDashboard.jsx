@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import usePatientStore from '../context/patientStore';
 import useAppointmentStore from '../context/appointmentStore';
@@ -11,6 +12,8 @@ import ConfirmActionDialog from '../components/ConfirmActionDialog';
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { patients, fetchPatients, deletePatient } = usePatientStore();
   const { appointments, fetchAppointments } = useAppointmentStore();
   const {
@@ -28,6 +31,10 @@ const AdminDashboard = () => {
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
 
+  // Determine active tab from URL
+  const path = location.pathname;
+  const activeTab = path.includes('/patients') ? 'patients' : path.includes('/appointments') ? 'appointments' : 'patients';
+
   useEffect(() => {
     const load = async () => {
       await Promise.all([fetchPatients(), fetchAppointments()]);
@@ -44,27 +51,57 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b border-cyan-200 pb-1">
+        <button
+          onClick={() => navigate('/admin/patients')}
+          className={`px-4 py-2 font-medium rounded-t-lg transition ${
+            activeTab === 'patients'
+              ? 'bg-cyan-100 text-cyan-800 border-b-2 border-cyan-600'
+              : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'
+          }`}
+        >
+          {t('patients.title')}
+        </button>
+        <button
+          onClick={() => navigate('/admin/appointments')}
+          className={`px-4 py-2 font-medium rounded-t-lg transition ${
+            activeTab === 'appointments'
+              ? 'bg-cyan-100 text-cyan-800 border-b-2 border-cyan-600'
+              : 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50'
+          }`}
+        >
+          {t('appointments.title')}
+        </button>
+      </div>
+
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.admin')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {activeTab === 'patients' ? t('patients.title') : t('appointments.title')}
+        </h1>
         <div className="space-x-4">
-          <button
-            onClick={() => {
-              setEditingPatient(null);
-              setShowPatientForm(true);
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            {t('patients.addPatient')}
-          </button>
-          <button
-            onClick={() => {
-              setEditingAppointment(null);
-              setShowAppointmentForm(true);
-            }}
-            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-          >
-            {t('appointments.title')}
-          </button>
+          {activeTab === 'patients' && (
+            <button
+              onClick={() => {
+                setEditingPatient(null);
+                setShowPatientForm(true);
+              }}
+              className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition"
+            >
+              {t('patients.addPatient')}
+            </button>
+          )}
+          {activeTab === 'appointments' && (
+            <button
+              onClick={() => {
+                setEditingAppointment(null);
+                setShowAppointmentForm(true);
+              }}
+              className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition"
+            >
+              {t('appointments.add') || 'Add Appointment'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -138,74 +175,80 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('patients.title')}</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('patients.name')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('patients.phone')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('patients.notes')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {patients.map((patient) => (
-                <tr key={patient.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {patient.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {patient.phone}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {patient.notes}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => {
-                        setEditingPatient(patient);
-                        setShowPatientForm(true);
-                      }}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
-                      {t('common.edit')}
-                    </button>
-                    <button
-                      onClick={() => setConfirmAction({
-                        title: 'Delete patient',
-                        description: `Delete ${patient.name}? This may remove related appointments if your database enforces cascade deletes.`,
-                        confirmText: 'Delete patient',
-                        action: () => deletePatient(patient.id),
-                      })}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      {t('common.delete')}
-                    </button>
-                  </td>
+      {/* Patients Table - only show when on patients tab */}
+      {activeTab === 'patients' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('patients.title')}</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('patients.name')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('patients.phone')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('patients.notes')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {patients.map((patient) => (
+                  <tr key={patient.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {patient.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {patient.phone}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {patient.notes}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => {
+                          setEditingPatient(patient);
+                          setShowPatientForm(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-900 mr-4"
+                      >
+                        {t('common.edit')}
+                      </button>
+                      <button
+                        onClick={() => setConfirmAction({
+                          title: 'Delete patient',
+                          description: `Delete ${patient.name}? This may remove related appointments if your database enforces cascade deletes.`,
+                          confirmText: 'Delete patient',
+                          action: () => deletePatient(patient.id),
+                        })}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        {t('common.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
-      <AppointmentList
-        appointments={appointments}
-        onEdit={(apt) => {
-          setEditingAppointment(apt);
-          setShowAppointmentForm(true);
-        }}
-      />
+      {/* Appointments List - only show when on appointments tab */}
+      {activeTab === 'appointments' && (
+        <AppointmentList
+          appointments={appointments}
+          onEdit={(apt) => {
+            setEditingAppointment(apt);
+            setShowAppointmentForm(true);
+          }}
+        />
+      )}
 
       {showPatientForm && (
         <PatientForm

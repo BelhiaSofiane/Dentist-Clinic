@@ -1,51 +1,72 @@
 ﻿{
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success"
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "back": "Retour"
   },
   "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "email": "Email",
-    "password": "Password"
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "E-mail",
+    "password": "Mot de passe"
+  },
+  "settings": {
+    "title": "Paramètres du compte",
+    "subtitle": "Gérez les paramètres de votre compte et de sécurité",
+    "accountInfo": "Informations du compte",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "enterCurrentPassword": "Entrez le mot de passe actuel",
+    "enterNewPassword": "Entrez le nouveau mot de passe",
+    "changePasswordButton": "Changer le mot de passe",
+    "currentPasswordRequired": "Le mot de passe actuel est requis",
+    "newPasswordRequired": "Le nouveau mot de passe est requis",
+    "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+    "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas",
+    "passwordsDifferent": "Le nouveau mot de passe doit être différent de l'actuel",
+    "passwordChangedSuccess": "Mot de passe changé avec succès",
+    "passwordChangeFailed": "Échec du changement de mot de passe",
+    "changing": "Modification..."
   },
   "patients": {
     "title": "Patients",
-    "name": "Name",
-    "phone": "Phone",
+    "name": "Nom",
+    "phone": "Téléphone",
     "notes": "Notes",
-    "addPatient": "Add Patient",
-    "editPatient": "Edit Patient"
+    "addPatient": "Ajouter un patient",
+    "editPatient": "Modifier le patient"
   },
   "appointments": {
-    "title": "Appointments",
+    "title": "Rendez-vous",
     "date": "Date",
-    "time": "Time",
-    "duration": "Duration",
-    "reason": "Reason",
-    "status": "Status",
-    "scheduled": "Scheduled",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "canceled": "Canceled"
+    "time": "Heure",
+    "duration": "Durée",
+    "reason": "Motif",
+    "status": "Statut",
+    "scheduled": "Planifié",
+    "inProgress": "En cours",
+    "completed": "Terminé",
+    "canceled": "Annulé"
   },
   "queue": {
-    "title": "Waiting Room",
-    "current": "Current Patient",
-    "waiting": "Waiting",
-    "next": "Next Patient",
-    "start": "Start Consultation",
-    "available": "Available",
-    "busy": "Busy"
+    "title": "Salle d'attente",
+    "current": "Patient actuel",
+    "waiting": "En attente",
+    "next": "Patient suivant",
+    "start": "Démarrer la consultation",
+    "available": "Disponible",
+    "busy": "Occupé"
   },
   "dashboard": {
-    "admin": "Admin Dashboard",
-    "agent": "Agent Dashboard"
+    "admin": "Tableau de bord admin",
+    "agent": "Tableau de bord agent"
   }
 }

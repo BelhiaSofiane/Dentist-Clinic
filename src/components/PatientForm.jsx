@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
 import usePatientStore from '../context/patientStore';
 
 const PatientForm = ({ patient, onClose }) => {
@@ -34,7 +35,7 @@ const PatientForm = ({ patient, onClose }) => {
       }
       onClose();
     } catch (error) {
-      console.error('Error saving patient:', error);
+      toast.error(t('common.error'));
     } finally {
       setLoading(false);
     }

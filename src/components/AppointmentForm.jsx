@@ -212,10 +212,10 @@ const AppointmentForm = ({ appointment, onClose }) => {
                   onChange={(e) => setFormData((prev) => ({ ...prev, status: e.target.value }))}
                   className="mt-1 block w-full px-3 py-2 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
-                  <option value="scheduled">Scheduled</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="canceled">Canceled</option>
+                  <option value="scheduled">{t('appointments.scheduled')}</option>
+                  <option value="in-progress">{t('appointments.inProgress')}</option>
+                  <option value="completed">{t('appointments.completed')}</option>
+                  <option value="canceled">{t('appointments.canceled')}</option>
                 </select>
               </div>
             </div>

@@ -1,19 +1,33 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, Stethoscope } from 'lucide-react';
+import { ShieldCheck, Stethoscope, Globe } from 'lucide-react';
 import useAuthStore from '../context/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 
+const languages = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+];
+
 const Login = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { signIn } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showLangMenu, setShowLangMenu] = useState(false);
+
+  const currentLang = languages.find((l) => l.code === i18n.language) || languages[0];
+
+  const handleLanguageChange = (langCode) => {
+    i18n.changeLanguage(langCode);
+    setShowLangMenu(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,6 +62,34 @@ const Login = () => {
         </section>
 
         <section className="p-8 md:p-10">
+          {/* Language Selector */}
+          <div className="relative mb-6">
+            <button
+              type="button"
+              onClick={() => setShowLangMenu(!showLangMenu)}
+              className="flex items-center gap-2 text-sm text-slate-600 hover:text-cyan-700 transition"
+            >
+              <Globe className="w-4 h-4" />
+              <span>{currentLang.flag} {currentLang.name}</span>
+            </button>
+            {showLangMenu && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-cyan-100 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-cyan-50 transition ${
+                      lang.code === i18n.language ? 'text-cyan-700 font-medium' : 'text-slate-600'
+                    }`}
+                  >
+                    {lang.flag} {lang.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-2 text-cyan-700 mb-6">
             <ShieldCheck className="w-5 h-5" />
             <span className="text-sm font-semibold uppercase tracking-wide">Secure Sign In</span>

@@ -46,6 +46,37 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, role: null, loading: false });
   },
 
+  updatePassword: async (currentPassword, newPassword) => {
+    set({ loading: true });
+    
+    try {
+      // Re-authenticate with current password first
+      const { data: { user: currentUser }, error: reauthError } = await supabase.auth.signInWithPassword({
+        email: get().user.email,
+        password: currentPassword,
+      });
+
+      if (reauthError) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Update to new password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      set({ loading: false });
+      return { success: true };
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
+
   initialize: async () => {
     if (get().initialized) return;
 
