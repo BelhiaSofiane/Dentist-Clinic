@@ -6,13 +6,15 @@ import usePatientStore from '../context/patientStore';
 
 const PatientForm = ({ patient, onClose }) => {
   const { t } = useTranslation();
-  const { addPatient, updatePatient } = usePatientStore();
+  const { addPatient, updatePatient, loading: storeLoading, error: storeError, clearError } = usePatientStore();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     notes: '',
   });
-  const [loading, setLoading] = useState(false);
+
+  // Use store loading state - automatically stays in sync
+  const isLoading = storeLoading;
 
   useEffect(() => {
     if (patient) {
@@ -24,9 +26,16 @@ const PatientForm = ({ patient, onClose }) => {
     }
   }, [patient]);
 
+  // Show error toast when store has an error, then clear it
+  useEffect(() => {
+    if (storeError) {
+      toast.error(storeError);
+      clearError();
+    }
+  }, [storeError, t, clearError]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
       if (patient) {
         await updatePatient(patient.id, formData);
@@ -35,9 +44,8 @@ const PatientForm = ({ patient, onClose }) => {
       }
       onClose();
     } catch (error) {
-      toast.error(t('common.error'));
-    } finally {
-      setLoading(false);
+      // Error is already handled via store error state
+      console.error('Patient operation failed:', error);
     }
   };
 
@@ -112,16 +120,17 @@ const PatientForm = ({ patient, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+              disabled={isLoading}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 disabled:opacity-50"
             >
               {t('common.cancel')}
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? t('common.loading') : t('common.save')}
+              {isLoading ? t('common.loading') : t('common.save')}
             </button>
           </div>
         </form>

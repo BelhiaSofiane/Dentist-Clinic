@@ -4,50 +4,85 @@ import { supabase } from '../lib/supabase';
 const usePatientStore = create((set, get) => ({
   patients: [],
   loading: false,
+  error: null,
 
   fetchPatients: async () => {
-    set({ loading: true });
+    set({ loading: true, error: null });
+    try {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    const { data, error } = await supabase
-      .from('patients')
-      .select('*')
-      .order('created_at', { ascending: false });
+      if (error) {
+        set({ loading: false, error: error.message });
+        throw error;
+      }
 
-    if (error) {
-      set({ loading: false });
+      set({ patients: data ?? [], loading: false, error: null });
+    } catch (error) {
+      set({ loading: false, error: error.message });
       throw error;
     }
-
-    set({ patients: data ?? [], loading: false });
   },
 
   addPatient: async (patient) => {
-    const { error } = await supabase
-      .from('patients')
-      .insert([patient]);
+    set({ loading: true, error: null });
+    try {
+      const { error: insertError } = await supabase
+        .from('patients')
+        .insert([patient]);
 
-    if (error) throw error;
+      if (insertError) {
+        set({ loading: false, error: insertError.message });
+        throw insertError;
+      }
 
-    await get().fetchPatients();
+      // Fetch updated list after successful insert
+      await get().fetchPatients();
+    } catch (error) {
+      set({ loading: false, error: error.message });
+      throw error;
+    }
   },
 
   updatePatient: async (id, updates) => {
-    const { error } = await supabase
-      .from('patients')
-      .update(updates)
-      .eq('id', id);
+    set({ loading: true, error: null });
+    try {
+      const { error } = await supabase
+        .from('patients')
+        .update(updates)
+        .eq('id', id);
 
-    if (error) throw error;
+      if (error) {
+        set({ loading: false, error: error.message });
+        throw error;
+      }
 
-    await get().fetchPatients();
+      await get().fetchPatients();
+    } catch (error) {
+      set({ loading: false, error: error.message });
+      throw error;
+    }
   },
 
   deletePatient: async (id) => {
-    const { error } = await supabase.from('patients').delete().eq('id', id);
-    if (error) throw error;
+    set({ loading: true, error: null });
+    try {
+      const { error } = await supabase.from('patients').delete().eq('id', id);
+      if (error) {
+        set({ loading: false, error: error.message });
+        throw error;
+      }
 
-    await get().fetchPatients();
+      await get().fetchPatients();
+    } catch (error) {
+      set({ loading: false, error: error.message });
+      throw error;
+    }
   },
+
+  clearError: () => set({ error: null }),
 }));
 
 export default usePatientStore;
